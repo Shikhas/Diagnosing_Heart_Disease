@@ -52,7 +52,7 @@ scatter_matrix(df, c= y_train,alpha= 0.8,figsize=(15,15),diagonal='kde', s = 200
 plt.show()
 
 ################################### Dimensionality Reduction  ##########################################################
-
+nVar = X_train.shape[1]
 pca = PCA().fit(X_train)
 print(pca.explained_variance_) #Explained variance is amount of variance explained by each of the selected component.
 # In other words, it is the eigenvalue
@@ -60,8 +60,28 @@ print(pca.explained_variance_) #Explained variance is amount of variance explain
 print(pca.explained_variance_ratio_) #Explained Variance Ratio is Explained Variance divided by sum of eigenvalues
 print()
 print(X_train.columns.values.tolist())
-print(pca.components_) #This shows the principal components where each column contains the coefficients for the linear
+#print(pca.components_) #This shows the principal components where each column contains the coefficients for the linear
 # transformation and the order of columns corresponds to that of Explained Variance
+
+cumulative_var_ratio = np.cumsum(pca.explained_variance_ratio_)
+
+
+plt.plot(pca.explained_variance_ratio_, marker = 'o')
+plt.xlabel('Index')
+plt.ylabel('Explained Variance Ratio')
+plt.xticks(np.arange(0,nVar))
+plt.axhline((1/nVar), color = 'r', linestyle = '--')
+plt.grid(True)
+plt.show()
+
+cumsum_variance_ratio = np.cumsum(pca.explained_variance_ratio_)
+plt.plot(cumsum_variance_ratio, marker = 'o')
+plt.xlabel('Index')
+plt.ylabel('Cumulative Explained Variance Ratio')
+plt.xticks(np.arange(0,nVar))
+plt.grid(True)
+plt.show()
+
 
 #Links - https://towardsdatascience.com/a-one-stop-shop-for-principal-component-analysis-5582fb7e0a9c
 
