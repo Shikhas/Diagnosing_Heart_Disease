@@ -198,22 +198,13 @@ print("Test set score after dimensionality reduction using Multinomial Logistic 
 '''
 logit = LogisticRegression()
 logit.fit(X_reduced_train, y_train)
-print("Train set score after dimensionality reduction using Multinomial Logistic Regression as classifier: {:.2f}".format(
+print("Train set score after dimensionality reduction using Logistic Regression as classifier: {:.2f}".format(
     logit.score(X_reduced_train,y_train)))
-print("Test set score after dimensionality reduction using Multinomial Logistic Regression as classifier: {:.2f}".format
+print("Test set score after dimensionality reduction using Logistic Regression as classifier: {:.2f}".format
       (logit.score(X_reduced_test,y_test)))
 lr_prob = logit.predict_proba(X_reduced_test)
 disease_lr_prob = lr_prob[:,1]
 lr_pred = logit.predict(X_reduced_test)
-'''
-Results are as follows for accuracy -  
-Train set score after dimensionality reduction using KNN as classifier: 0.85
-Test set score after dimensionality reduction using KNN as classifier: 0.84
-Train set score after dimensionality reduction using Decision Tree as classifier: 0.91
-Test set score after dimensionality reduction using Decision Tree as classifier: 0.75
-Train set score after dimensionality reduction using Multinomial Logistic Regression as classifier: 0.85
-Test set score after dimensionality reduction using Multinomial Logistic Regression as classifier: 0.83
-'''
 
 def evaluation_metrics(predProbY,nY, Y, pred_by_model):
     # Determine the predicted class of Y
@@ -252,24 +243,6 @@ evaluation_metrics(disease_DT_prob,X_test.shape[0],y_test, DT_pred)
 print("Metrics for Logistic Regression")
 evaluation_metrics(disease_lr_prob, X_test.shape[0],y_test, lr_pred)
 
-
-'''
-Metrics for K-Neares-Neighbors
-                  Accuracy: 0.8421052631579
-    Misclassification Rate: 0.1578947368421
-          Area Under Curve: 0.8369337979094
-Root Average Squared Error: 0.3655036399936
-Metrics for Decision Tree
-                  Accuracy: 0.7500000000000
-    Misclassification Rate: 0.2500000000000
-          Area Under Curve: 0.7473867595819
-Root Average Squared Error: 0.4330595232888
-Metrics for Logistic Regression
-                  Accuracy: 0.8289473684211
-    Misclassification Rate: 0.1710526315789
-          Area Under Curve: 0.8205574912892
-Root Average Squared Error: 0.3440307449803
-'''
 ###################################  Receiver Operating Charecteristics (ROC) curve of three models ####################
 
 OneMinusSpecificity, Sensitivity, thresholds = metrics.roc_curve(y_test, disease_lr_prob, pos_label = 1)
