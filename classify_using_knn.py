@@ -55,7 +55,7 @@ X_train=(X_train-np.mean(X_train))/(np.std(X_train)).values  #Standardization
 #X_test=(X_test-np.min(X_test))/(np.max(X_test)-np.min(X_test)).values  #Rescaling (min-max normalization)
 X_test=(X_test-np.mean(X_test))/(np.std(X_test)).values
 
-df = pandas.DataFrame(X_train, columns=X_data.columns)
+df = pandas.DataFrame(X_train, columns=X_train.columns)
 scatter_matrix(df, c= y_train,alpha= 0.8,figsize=(15,15),diagonal='hist', s = 200 ,marker='o')
 plt.show()
 
@@ -272,10 +272,21 @@ Root Average Squared Error: 0.3440307449803
 '''
 ###################################  Receiver Operating Charecteristics (ROC) curve of three models ####################
 
+OneMinusSpecificity, Sensitivity, thresholds = metrics.roc_curve(y_test, disease_lr_prob, pos_label = 1)
+print(thresholds)
+
 def roc_curve_generator(Y, pred_prob_knn, pred_prob_dt, pred_prob_lr):
-    cutoffs = [2., 1., 0.72, 0.49230769, 0.3,
-               0.23076923, 0.19298246, 0.17105263, 0.13043478,
-               0.09090909, -1]   # Generate the coordinates
+    cutoffs = [2., 1.99127429e+00, 9.91274291e-01, 9.14664902e-01, 9.09414992e-01,
+    8.57224582e-01, 8.43509912e-01, 7.73802992e-01, 7.52658168e-01,
+    7.27722115e-01, 7.20626253e-01, 6.82960989e-01, 6.64565233e-01,
+    6.44856271e-01, 6.33495883e-01, 6.29577387e-01, 6.25753078e-01,
+    6.07772623e-01, 5.55190856e-01, 5.54139935e-01, 4.60295125e-01,
+    4.49264073e-01, 4.42373365e-01, 3.86241321e-01, 9.63210848e-02,
+    8.48758125e-02, 1.67621012e-03, -1]
+    # These cutoffs are coordinates which are generated using metrics.roc_curve which returns thresholds used as
+    # coordinates.
+
+    # In addition to thresholds points we add 2. and -1 in cutoffs, so that our ROC begins at 0 and ends at 1
     knn_sensitivity = []
     knn_one_minus_specificity = []
     logistc_sensitivity = []
