@@ -31,7 +31,7 @@ patients_data_train, patients_data_test = train_test_split(patients_data,random_
 # the random state parameter in split, if int, random_state is the seed used by the random number generator and as it
 # is a fixed number the outcome of split will be deterministic means split for Run 1 = split for Run2, we can use any
 # number  for random_state parameter like 0,42, 21, etc.
-# print(X_data.columns)
+print(patients_data.columns)
 X_train = patients_data_train.drop('target',axis=1) # 1 is for column name in axis
 y_train = patients_data_train['target']
 
@@ -157,7 +157,13 @@ print("Test set score after dimensionality reduction using Decision Tree as clas
 
 heart_disease_DT_without_PCA = classTree.fit(X_train, y_train)
 dot_data = tree.export_graphviz(heart_disease_DT,out_file=None, impurity=True, filled=True,
-                                feature_names= X_train.columns, class_names=['0','1'])
+                                feature_names=["Age","Sex","Chest Pain Type","Resting Blood Pressure","Serum Cholestrol"
+                                    ,"Fasting Blood Sugar","Resting Electrocardiographic Results",
+                                               "Maximum Heart Rate Achieved","Exercise Induced Angina ",
+                                               "ST depression induced by exercise relative to rest",
+                                               "Slope of the peak exercise ST segment",
+                                            "Number of major vessels",
+                                               "THAL"] , class_names=['Not Present','Present'])
 graph = graphviz.Source(dot_data)
 graph.render('heart_disease_decision_tree',".")
 
