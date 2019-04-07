@@ -104,6 +104,11 @@ pca = PCA(n_components=5)  # as the elbow in the graph is at number of dimension
 X_reduced_train = pandas.DataFrame(pca.fit_transform(X_train))
 X_reduced_test = pandas.DataFrame(pca.fit_transform(X_test))
 
+###### Randomized PCA
+#rnd_pca= PCA(n_components=5, svd_solver="randomized")
+#X_reduced_train = pandas.DataFrame(rnd_pca.fit_transform(X_train))
+#X_reduced_test = pandas.DataFrame(rnd_pca.fit_transform(X_test))
+
 ################################### Inplementing knn without Dimensionality Reduction  #################################
 knn = KNeighborsClassifier(n_neighbors=13)  #n_neighbors is number of neighbors to use for kneighbors queries
 knn.fit(X_train, y_train)
@@ -137,6 +142,7 @@ plt.plot(n_neighbors, k_scores)
 plt.xlabel("Value of k for KNN")
 plt.ylabel("Cross-Validated Accuracy")
 plt.show()
+
 
 ################################### Implementing knn after Dimensionality Reduction  #################################
 knn = KNeighborsClassifier(n_neighbors=14)  #n_neighbors is number of neighbors to use for kneighbors queries
