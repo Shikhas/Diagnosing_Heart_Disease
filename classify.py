@@ -34,10 +34,10 @@ patients_data_train, patients_data_test = train_test_split(patients_data,random_
 # is a fixed number the outcome of split will be deterministic means split for Run 1 = split for Run2, we can use any
 # number  for random_state parameter like 0,42, 21, etc.
 print(patients_data.columns)
-X_train = patients_data_train.drop('target',axis=1) # 1 is for column name in axis
+X_train = patients_data_train.drop('target',axis=1)  #1 is for column name in axis
 y_train = patients_data_train['target']
 
-X_test = patients_data_test.drop('target',axis=1) # 1 is for column name in axis
+X_test = patients_data_test.drop('target',axis=1)  #1 is for column name in axis
 y_test = patients_data_test['target']
 
 print("X_train", X_train.shape)
@@ -79,6 +79,7 @@ cumulative_var_ratio = np.cumsum(pca.explained_variance_ratio_)
 
 
 plt.plot(np.arange(1,nVar+1), pca.explained_variance_ratio_, marker = 'o')
+plt.title("Explained Variance Ratio vs Index")
 plt.xlabel('Index')
 plt.ylabel('Explained Variance Ratio')
 plt.xticks(np.arange(1,nVar+1))
@@ -87,6 +88,7 @@ plt.grid(True)
 plt.show()
 
 plt.plot(np.arange(1,nVar+1),pca.explained_variance_,marker = 'o')
+plt.title("Explained Variance vs Index")
 plt.xlabel("Index")
 plt.ylabel("Explained Variance")
 plt.xticks(np.arange(1,nVar+1))
@@ -94,6 +96,7 @@ plt.grid(True)
 plt.show()
 
 plt.plot(np.arange(1,nVar+1),cumulative_var_ratio, marker = 'o')
+plt.title("Cumulative Explained Variance Ratio vs Index")
 plt.xlabel('Index')
 plt.ylabel('Cumulative Explained Variance Ratio')
 plt.xticks(np.arange(1,nVar+1))
@@ -102,7 +105,8 @@ plt.show()
 
 # pca = PCA(n_components=0.90) we can set n_components to be a float between 0.0 to 1.0, indicating the ratio of
 # variance we wish to preserve
-pca = PCA(n_components=5)  # as the elbow in the graph is at number of dimensions to be 5
+pca = PCA(n_components=5)  # as the elbow in the graph is at number of dimensions to be 5, select the eigenvalue whose
+# Variance Explained Ratio is greater than the reciprocal of the number of variables.
 X_reduced_train = pandas.DataFrame(pca.fit_transform(X_train))
 X_reduced_test = pandas.DataFrame(pca.fit_transform(X_test))
 
@@ -127,6 +131,8 @@ for n_neigh in n_neighbors:
     test_data_accuracy.append(knn.score(X_reduced_test, y_test))
 plt.plot(n_neighbors, train_data_accuracy, label="Train Data Set")
 plt.plot(n_neighbors, test_data_accuracy, label="Test Data Set")
+plt.grid(True)
+plt.title("Accuracy vs Neighbors for Train and Test data")
 plt.ylabel("Accuracy")
 plt.xlabel("Neighbors")
 plt.legend()
@@ -141,8 +147,10 @@ for n_neigh in n_neighbors:
 print(k_scores)
 
 plt.plot(n_neighbors, k_scores)
-plt.xlabel("Value of k for KNN")
+plt.title("Cross Validation Accuracy vs Neighbors for Train data")
+plt.xlabel("Neighbors")
 plt.ylabel("Cross-Validated Accuracy")
+plt.grid(True)
 plt.show()
 
 
@@ -159,7 +167,6 @@ knn_pred = knn.predict(X_reduced_test)
 
 ################################### Implementing Decision tree after Dimensionality Reduction  #########################
 classTree = tree.DecisionTreeClassifier(criterion='entropy', max_depth=5, random_state=42)
-
 heart_disease_DT = classTree.fit(X_reduced_train, y_train)
 print("Train set score after dimensionality reduction using Decision Tree as classifier: {:.2f}".format(
     classTree.score(X_reduced_train, y_train)))
@@ -217,14 +224,7 @@ def evaluation_metrics(predProbY,nY, Y, pred_by_model):
             predY[i] = 0
 
     # Calculate the Root Average Squared Error
-    RASE = 0.0
-    for i in range(nY):
-        if true_y_val[i] ==1:
-            RASE += (1 - predProbY[i])**2
-        else:
-            RASE += (0 - predProbY[i])**2
 
-    RASE = np.sqrt(RASE/nY)
     RASE = np.sqrt(metrics.mean_squared_error(true_y_val, predProbY))
     AUC = metrics.roc_auc_score(true_y_val, pred_by_model)
     accuracy = metrics.accuracy_score(Y, predY)
@@ -249,62 +249,28 @@ OneMinusSpecificity, Sensitivity, thresholds = metrics.roc_curve(y_test, disease
 print(thresholds)
 
 def roc_curve_generator(Y, pred_prob_knn, pred_prob_dt, pred_prob_lr):
-    cutoffs = [2., 1.99127429e+00, 9.91274291e-01, 9.14664902e-01, 9.09414992e-01,
-    8.57224582e-01, 8.43509912e-01, 7.73802992e-01, 7.52658168e-01,
-    7.27722115e-01, 7.20626253e-01, 6.82960989e-01, 6.64565233e-01,
-    6.44856271e-01, 6.33495883e-01, 6.29577387e-01, 6.25753078e-01,
-    6.07772623e-01, 5.55190856e-01, 5.54139935e-01, 4.60295125e-01,
-    4.49264073e-01, 4.42373365e-01, 3.86241321e-01, 9.63210848e-02,
-    8.48758125e-02, 1.67621012e-03, -1]
-    # These cutoffs are coordinates which are generated using metrics.roc_curve which returns thresholds used as
-    # coordinates.
+    plt.figure()  # create a new figure
+    axs = plt.gca() # get the axes instance on current figure
 
-    # In addition to thresholds points we add 2. and -1 in cutoffs, so that our ROC begins at 0 and ends at 1
-    knn_sensitivity = []
-    knn_one_minus_specificity = []
-    logistc_sensitivity = []
-    logistic_one_minus_specificity = []
-    dt_sensitivity = []
-    dt_one_minus_specificity = []
-    for cutoff in cutoffs:
-        knn_y_pred = np.zeros(Y.count())
-        dt_y_pred = np.zeros(Y.count())
-        logistic_y_pred = np.zeros(Y.count())
+    false_pos, true_pos,_ = metrics.roc_curve(Y, pred_prob_knn, pos_label =1)
+    axs.plot(false_pos, true_pos, color = 'blue', marker ='o', label = 'K Nearest Neighbor')
+    false_pos, true_pos, _ = metrics.roc_curve(Y, pred_prob_dt, pos_label=1)
+    axs.plot(false_pos, true_pos, color='orange', marker='o', label='Drcision Tree')
+    false_pos, true_pos, _ = metrics.roc_curve(Y, pred_prob_lr, pos_label=1)
+    axs.plot(false_pos, true_pos, color='green', marker='o', label='Logistic Regression')
 
-        knn_y_pred[pred_prob_knn >= cutoff] = 1
-        dt_y_pred[pred_prob_dt >= cutoff] = 1
-        logistic_y_pred[pred_prob_lr >= cutoff] = 1
+    axs.plot([0,1],[0,1], color='red', linestyle = ':', label='Uniformly Random Model') # Plotting line for using
+    # randomly uniform  model
 
-        true_neg, false_pos, false_neg, true_pos = metrics.confusion_matrix(Y, knn_y_pred).ravel()
-        knn_sensitivity.append(true_pos / (true_pos + false_neg))
-        knn_one_minus_specificity.append(false_pos / (false_pos + true_neg))
-
-        true_neg, false_pos, false_neg, true_pos = metrics.confusion_matrix(Y, dt_y_pred).ravel()
-        dt_sensitivity.append(true_pos / (true_pos + false_neg))
-        dt_one_minus_specificity.append(false_pos / (false_pos + true_neg))
-
-        true_neg, false_pos, false_neg, true_pos = metrics.confusion_matrix(Y, logistic_y_pred).ravel()
-        logistc_sensitivity.append(true_pos / (true_pos + false_neg))
-        logistic_one_minus_specificity.append(false_pos / (false_pos + true_neg))
-
-    # Draw the ROC curve
-    axs = plt.gca()
-    # plt.figure(figsize=(6,6))
-    axs.plot(knn_one_minus_specificity, knn_sensitivity, marker='o',
-             color='purple', linestyle='solid', linewidth=2, markersize=6, label="K-Nearest-Neaighbors")
-    axs.plot(dt_one_minus_specificity, dt_sensitivity, marker='o',
-                 color='blue', linestyle='solid', linewidth=2, markersize=6, label="Decision Tree")
-    axs.plot([0, 1], [0, 1], color='red', linestyle=':')
-    axs.plot(logistic_one_minus_specificity, logistc_sensitivity, marker='o',
-                 color='green', linestyle='solid', linewidth=2, markersize=6, label="Logistic Regression")
-
-    axs.legend()
+    plt.legend()
     plt.grid(True)
+    axs.set_title("True Positive Rate vs False Positive Rate ") # Y vs X
     plt.xlabel("1 - Specificity (False Positive Rate)")
     plt.ylabel("Sensitivity (True Positive Rate)")
-    ax = plt.gca()
-    ax.set_aspect('equal')
     plt.show()
+
+# false negative is also important
+
 
 
 roc_curve_generator(y_test, disease_prob_knn, disease_DT_prob, disease_lr_prob)
